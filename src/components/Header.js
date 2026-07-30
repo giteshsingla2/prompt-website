@@ -21,12 +21,6 @@ export default function Header({ activeView }) {
           >
             About Us
           </a>
-          <a
-            className={"pf-nav-link" + (activeView === "admin" ? " is-active" : "")}
-            href="/admin"
-          >
-            Add Poster
-          </a>
         </nav>
       </div>
     </header>

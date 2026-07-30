@@ -29,6 +29,10 @@ const PostSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide the AI prompt for this poster."],
     },
+    content: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,

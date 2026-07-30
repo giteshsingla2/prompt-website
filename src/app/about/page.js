@@ -1,29 +1,71 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
-import { Info, User, HelpCircle, Server, Check } from "lucide-react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
+import { getCachedPosts } from "@/lib/dataCache";
+import { Sparkles, ImagePlus, Copy, Zap, Star, Heart } from "lucide-react";
 
-export default function AboutPage() {
-  const [allPosts, setAllPosts] = useState([]);
+export const metadata = {
+  title: "About POSTR. — AI Poster Prompt Library",
+  description:
+    "POSTR. is a curated library of AI image prompts built for creators who want stunning posters, editorial graphics, and aesthetic visuals without the trial-and-error.",
+};
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const res = await fetch("/api/posts");
-        if (res.ok) {
-          const list = await res.json();
-          setAllPosts(list);
-        }
-      } catch (error) {
-        console.error("Failed to load posts for sidebar:", error);
-      }
-    };
-    fetchPosts();
-  }, []);
+export default async function AboutPage() {
+  let allPosts = [];
+  try {
+    allPosts = await getCachedPosts();
+  } catch (e) {}
 
-  const categories = Array.from(new Set(allPosts.map((p) => p.category)));
+  const categories = [...new Set(allPosts.map((p) => p.category))];
+
+  const features = [
+    {
+      icon: <Sparkles size={22} />,
+      title: "Expertly Crafted Prompts",
+      body:
+        "Every prompt in our library is tested and refined to produce consistent, print-ready results across the leading AI image generators — no guesswork required.",
+    },
+    {
+      icon: <ImagePlus size={22} />,
+      title: "Every Visual Style Covered",
+      body:
+        "From moody cinematic noir to soft minimalist prints, retro typography to surreal dreamscapes — our growing library spans the full spectrum of poster aesthetics.",
+    },
+    {
+      icon: <Copy size={22} />,
+      title: "One Click to Copy",
+      body:
+        "Unlock a prompt in seconds, copy it with a single tap, and paste it straight into Midjourney, DALL·E, Stable Diffusion, Firefly, or any other generator you prefer.",
+    },
+    {
+      icon: <Zap size={22} />,
+      title: "Skip Hours of Trial & Error",
+      body:
+        "We obsess over the details — lighting angles, focal length, color grading, negative space — so you can go from idea to finished image in minutes, not hours.",
+    },
+  ];
+
+  const steps = [
+    {
+      num: "01",
+      title: "Browse the library",
+      body: "Scroll the feed, filter by category, and find the visual style that fits your project.",
+    },
+    {
+      num: "02",
+      title: "Unlock the prompt",
+      body: "Watch a short sponsored ad to reveal the full prompt — or it unlocks automatically if no ad is available.",
+    },
+    {
+      num: "03",
+      title: "Copy & generate",
+      body: "Hit copy, paste the prompt into your favourite AI image tool, and get a stunning image in seconds.",
+    },
+    {
+      num: "04",
+      title: "Keep coming back",
+      body: "We add new prompts regularly, covering fresh styles, seasonal themes, and trending aesthetics.",
+    },
+  ];
 
   return (
     <div className="pf-app">
@@ -32,69 +74,191 @@ export default function AboutPage() {
       <div className="pf-shell">
         <main className="pf-main">
           <article className="pf-post">
-            <h1 className="pf-post-title">About POSTR.</h1>
-            <p className="pf-post-meta-plain">Learn about our mission, technology stack, and prompt curation.</p>
 
-            <div className="pf-post-img" style={{ background: "linear-gradient(135deg, var(--tag-bg) 0%, var(--bg) 100%)", padding: "40px 20px", textAlign: "center" }}>
-              <div style={{ fontSize: "64px", fontWeight: "700", fontFamily: "var(--display)", color: "var(--primary-dark)" }}>
-                POSTR.
+            {/* Hero */}
+            <div style={{
+              background: "linear-gradient(135deg, var(--primary) 0%, #C1631E 100%)",
+              borderRadius: "18px",
+              padding: "52px 40px",
+              textAlign: "center",
+              marginBottom: "36px",
+              position: "relative",
+              overflow: "hidden",
+            }}>
+              <div style={{
+                position: "absolute", inset: 0, opacity: 0.07,
+                backgroundImage: "radial-gradient(circle at 20% 80%, #fff 1px, transparent 1px), radial-gradient(circle at 80% 20%, #fff 1px, transparent 1px)",
+                backgroundSize: "40px 40px",
+              }} />
+              <div style={{ position: "relative", zIndex: 1 }}>
+                <h1 style={{
+                  fontFamily: "var(--display)", fontSize: "clamp(40px, 8vw, 72px)",
+                  color: "#fff", margin: "0 0 12px", lineHeight: 1,
+                }}>
+                  POSTR<span style={{ opacity: 0.7 }}>.</span>
+                </h1>
+                <p style={{
+                  color: "rgba(255,255,255,0.85)", fontSize: "17px",
+                  fontWeight: "500", margin: 0, maxWidth: "420px", marginInline: "auto",
+                  lineHeight: 1.55,
+                }}>
+                  The fastest way to create stunning AI-generated posters &amp; visuals.
+                </p>
               </div>
-              <p style={{ margin: "10px 0 0", color: "var(--text)", fontSize: "14.5px", fontWeight: "600", letterSpacing: "1px", textTransform: "uppercase" }}>
-                AI Poster Prompt Library
-              </p>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "24px", marginTop: "24px" }}>
-              <section>
-                <h3 style={{ fontFamily: "var(--display)", fontSize: "22px", color: "var(--ink)", margin: "0 0 10px" }}>
-                  What is POSTR?
-                </h3>
-                <p className="pf-post-blurb">
-                  POSTR is a curated library of ready-to-copy prompts tailored specifically for high-impact posters, prints, and editorial graphics. We do the heavy lifting of dialing in lighting, negative space, camera angles, color grading, and styles, saving you hours of trial and error in AI image generators.
-                </p>
-              </section>
+            {/* Mission */}
+            <section style={{ marginBottom: "36px" }}>
+              <h2 style={{ fontFamily: "var(--display)", fontSize: "26px", color: "var(--ink)", margin: "0 0 12px" }}>
+                What is POSTR.?
+              </h2>
+              <p className="pf-post-blurb" style={{ lineHeight: 1.75, margin: 0 }}>
+                POSTR. is a hand-curated library of AI image prompts built for designers,
+                creators, and visual storytellers. We believe the hardest part of AI image
+                generation isn't the tool — it's knowing exactly what to say. That's where
+                we come in. Every prompt in our collection has been written, tested, and
+                refined to reliably produce poster-quality results across Midjourney, DALL·E,
+                Stable Diffusion, Adobe Firefly, and beyond.
+              </p>
+            </section>
 
-              <section>
-                <h3 style={{ fontFamily: "var(--display)", fontSize: "22px", color: "var(--ink)", margin: "0 0 10px" }}>
-                  How It Works
-                </h3>
-                <p className="pf-post-blurb">
-                  Browse the home feed, find a style that aligns with your creative brief, and click it. To unlock the full details of the prompt:
-                </p>
-                <ul style={{ paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "8px", fontSize: "15px", lineHeight: "1.6", color: "var(--text)" }}>
-                  <li><strong>Sponsor Ad Integration</strong>: Watch a brief Google Ad Manager rewarded ad slot to claim your prompt.</li>
-                  <li><strong>Unfilled Fallback</strong>: If ad inventories are low or blocked, the library automatically reveals the prompt on the same page, ensuring an uninterrupted workflow.</li>
-                  <li><strong>Personal Claims</strong>: Once claimed, your unlocked prompts are saved locally to your browser's persistent storage, so you don't have to watch the sponsor ad again.</li>
-                </ul>
-              </section>
-
-              <section>
-                <h3 style={{ fontFamily: "var(--display)", fontSize: "22px", color: "var(--ink)", margin: "0 0 10px" }}>
-                  Our Tech Stack
-                </h3>
-                <p className="pf-post-blurb">
-                  Built as a fast, dynamic Next.js Web App:
-                </p>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginTop: "10px" }}>
-                  <div style={{ background: "var(--card)", border: "1px solid var(--line)", padding: "16px", borderRadius: "12px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: "700", color: "var(--ink)", marginBottom: "6px" }}>
-                      <Server size={18} style={{ color: "var(--primary)" }} /> MongoDB Backend
+            {/* Feature Cards */}
+            <section style={{ marginBottom: "36px" }}>
+              <h2 style={{ fontFamily: "var(--display)", fontSize: "26px", color: "var(--ink)", margin: "0 0 18px" }}>
+                Why creators love POSTR.
+              </h2>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
+                gap: "14px",
+              }}>
+                {features.map((f) => (
+                  <div key={f.title} style={{
+                    background: "var(--card)",
+                    border: "1px solid var(--line)",
+                    borderRadius: "14px",
+                    padding: "20px",
+                  }}>
+                    <div style={{
+                      width: "40px", height: "40px", borderRadius: "11px",
+                      background: "var(--tag-bg)", color: "var(--primary)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      marginBottom: "12px",
+                    }}>
+                      {f.icon}
                     </div>
-                    <p style={{ margin: "0", fontSize: "13px", color: "var(--muted)", lineHeight: "1.5" }}>
-                      All posters are fetched dynamically from a live database, making prompt updates instantaneous.
+                    <h3 style={{
+                      fontFamily: "var(--display)", fontSize: "17px",
+                      color: "var(--ink)", margin: "0 0 8px",
+                    }}>
+                      {f.title}
+                    </h3>
+                    <p style={{ margin: 0, fontSize: "13.5px", color: "var(--muted)", lineHeight: 1.65 }}>
+                      {f.body}
                     </p>
                   </div>
-                  <div style={{ background: "var(--card)", border: "1px solid var(--line)", padding: "16px", borderRadius: "12px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: "700", color: "var(--ink)", marginBottom: "6px" }}>
-                      <HelpCircle size={18} style={{ color: "var(--accent)" }} /> Premium Vanilla CSS
+                ))}
+              </div>
+            </section>
+
+            {/* How It Works */}
+            <section style={{ marginBottom: "36px" }}>
+              <h2 style={{ fontFamily: "var(--display)", fontSize: "26px", color: "var(--ink)", margin: "0 0 18px" }}>
+                How it works
+              </h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                {steps.map((s) => (
+                  <div key={s.num} style={{
+                    display: "flex", gap: "16px", alignItems: "flex-start",
+                    background: "var(--card)", border: "1px solid var(--line)",
+                    borderRadius: "14px", padding: "18px 20px",
+                  }}>
+                    <div style={{
+                      fontFamily: "var(--display)", fontSize: "28px", lineHeight: 1,
+                      color: "var(--primary)", minWidth: "44px", opacity: 0.85,
+                    }}>
+                      {s.num}
                     </div>
-                    <p style={{ margin: "0", fontSize: "13px", color: "var(--muted)", lineHeight: "1.5" }}>
-                      Designed from the ground up without heavy templates, featuring responsive grids and custom typography variables.
-                    </p>
+                    <div>
+                      <h4 style={{ margin: "0 0 5px", fontSize: "15px", fontWeight: "700", color: "var(--ink)" }}>
+                        {s.title}
+                      </h4>
+                      <p style={{ margin: 0, fontSize: "13.5px", color: "var(--muted)", lineHeight: 1.6 }}>
+                        {s.body}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Compatible Tools */}
+            <section style={{ marginBottom: "36px" }}>
+              <h2 style={{ fontFamily: "var(--display)", fontSize: "26px", color: "var(--ink)", margin: "0 0 14px" }}>
+                Works with any AI image generator
+              </h2>
+              <p className="pf-post-blurb" style={{ margin: "0 0 16px", lineHeight: 1.7 }}>
+                Our prompts are written in plain English and optimised for maximum compatibility.
+                No matter which tool you prefer, POSTR. prompts plug in and produce.
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                {["Midjourney", "DALL·E 3", "Stable Diffusion", "Adobe Firefly", "Ideogram", "Flux", "Leonardo AI", "Kling AI"].map((tool) => (
+                  <span key={tool} style={{
+                    background: "var(--tag-bg)", color: "var(--primary-dark)",
+                    border: "1px solid var(--line)", borderRadius: "20px",
+                    padding: "6px 14px", fontSize: "13px", fontWeight: "600",
+                  }}>
+                    {tool}
+                  </span>
+                ))}
+              </div>
+            </section>
+
+            {/* Stats / Social proof */}
+            <section style={{
+              background: "var(--card)", border: "1px solid var(--line)",
+              borderRadius: "16px", padding: "28px", marginBottom: "36px",
+              display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+              gap: "24px", textAlign: "center",
+            }}>
+              {[
+                { val: `${allPosts.length || "50"}+`, label: "Prompts in library" },
+                { val: `${categories.length || "8"}+`, label: "Style categories" },
+                { val: "Free", label: "Always free to browse" },
+                { val: "Daily", label: "New prompts added" },
+              ].map((s) => (
+                <div key={s.label}>
+                  <div style={{ fontFamily: "var(--display)", fontSize: "34px", color: "var(--primary)", marginBottom: "4px" }}>
+                    {s.val}
+                  </div>
+                  <div style={{ fontSize: "12.5px", color: "var(--muted)", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    {s.label}
                   </div>
                 </div>
-              </section>
-            </div>
+              ))}
+            </section>
+
+            {/* CTA */}
+            <section style={{ textAlign: "center", padding: "8px 0 8px" }}>
+              <Heart size={18} style={{ color: "var(--primary)", marginBottom: "10px" }} />
+              <h2 style={{ fontFamily: "var(--display)", fontSize: "24px", color: "var(--ink)", margin: "0 0 10px" }}>
+                Ready to create?
+              </h2>
+              <p style={{ color: "var(--muted)", fontSize: "14px", margin: "0 0 20px", lineHeight: 1.6 }}>
+                Browse the full library, find your visual style, and unlock a prompt in seconds.
+              </p>
+              <a href="/" style={{
+                display: "inline-flex", alignItems: "center", gap: "8px",
+                background: "var(--primary)", color: "#fff", textDecoration: "none",
+                padding: "13px 28px", borderRadius: "12px", fontWeight: "700",
+                fontSize: "15px", boxShadow: "0 6px 18px rgba(224,122,46,0.25)",
+                transition: "all 0.2s",
+              }}>
+                <Sparkles size={16} />
+                Explore the library
+              </a>
+            </section>
+
           </article>
         </main>
 

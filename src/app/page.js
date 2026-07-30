@@ -5,6 +5,39 @@ import { Loader2, Tag, Unlock, Lock, Clock, ImagePlus, Search } from "lucide-rea
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 
+// Component that dynamically registers a Google Ad Manager in-feed slot
+function InFeedAd({ index }) {
+  useEffect(() => {
+    window.googletag = window.googletag || { cmd: [] };
+    let slot;
+    const adUnit = process.env.NEXT_PUBLIC_GAM_INFEED_AD_UNIT || "/21775744923/example/banner";
+    
+    googletag.cmd.push(() => {
+      // Define a slot targeting the unique container ID for this index
+      slot = googletag.defineSlot(adUnit, [300, 250], `div-gpt-ad-infeed-${index}`);
+      if (slot) {
+        slot.addService(googletag.pubads());
+        googletag.display(`div-gpt-ad-infeed-${index}`);
+      }
+    });
+
+    // Cleanup slot on unmount/re-render to prevent duplicate element registration
+    return () => {
+      googletag.cmd.push(() => {
+        if (slot) {
+          googletag.destroySlots([slot]);
+        }
+      });
+    };
+  }, [index]);
+
+  return (
+    <div className="pf-ad-card-infeed">
+      <div id={`div-gpt-ad-infeed-${index}`} style={{ width: "300px", height: "250px" }} />
+    </div>
+  );
+}
+
 export default function HomeFeed() {
   const [posts, setPosts] = useState([]);
   const [unlockedIds, setUnlockedIds] = useState([]);
@@ -122,32 +155,42 @@ export default function HomeFeed() {
                 </div>
               ) : (
                 <div className="pf-grid">
-                  {filtered.map((p) => (
-                    <a
-                      className="pf-card"
-                      key={p.id}
-                      href={`/posts/${p.id}`}
-                      style={{ textDecoration: "none" }}
-                    >
-                      <div className="pf-card-img">
-                        <img src={p.image} alt={p.title} loading="lazy" />
-                      </div>
-                      <div className="pf-card-body">
-                        <div className="pf-card-tags">
-                          <span className="pf-tag"><Tag size={11} /> {p.category}</span>
-                          {unlockedIds.includes(p.id) ? (
-                            <span className="pf-tag pf-tag-open"><Unlock size={11} /> Unlocked</span>
-                          ) : (
-                            <span className="pf-tag pf-tag-locked"><Lock size={11} /> Locked</span>
-                          )}
+                  {/* Reduce array to insert InFeedAds after every 2 posts */}
+                  {filtered.reduce((acc, p, index) => {
+                    acc.push(
+                      <a
+                        className="pf-card"
+                        key={p.id}
+                        href={`/posts/${p.id}`}
+                        style={{ textDecoration: "none" }}
+                      >
+                        <div className="pf-card-img">
+                          <img src={p.image} alt={p.title} loading="lazy" />
                         </div>
-                        <h3>{p.title}</h3>
-                        <div className="pf-card-meta">
-                          <Clock size={12} /> {p.date} · by {p.author}
+                        <div className="pf-card-body">
+                          <div className="pf-card-tags">
+                            <span className="pf-tag"><Tag size={11} /> {p.category}</span>
+                            {unlockedIds.includes(p.id) ? (
+                              <span className="pf-tag pf-tag-open"><Unlock size={11} /> Unlocked</span>
+                            ) : (
+                              <span className="pf-tag pf-tag-locked"><Lock size={11} /> Locked</span>
+                            )}
+                          </div>
+                          <h3>{p.title}</h3>
+                          <div className="pf-card-meta">
+                            <Clock size={12} /> {p.date} · by {p.author}
+                          </div>
                         </div>
-                      </div>
-                    </a>
-                  ))}
+                      </a>
+                    );
+
+                    // Insert ad unit after every 2 posts (index 1, 3, 5...)
+                    if ((index + 1) % 2 === 0) {
+                      acc.push(<InFeedAd key={`infeed-ad-${index}`} index={index} />);
+                    }
+
+                    return acc;
+                  }, [])}
                 </div>
               )}
             </div>

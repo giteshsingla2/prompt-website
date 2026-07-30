@@ -174,6 +174,42 @@ export default function PostDetailPage({ params }) {
     };
   }, [loading, post, unlocked]);
 
+  // GPT Banner setup above prompt card
+  useEffect(() => {
+    if (loading || !post) return;
+
+    window.googletag = window.googletag || { cmd: [] };
+    let bannerSlot = null;
+    const bannerAdUnit = process.env.NEXT_PUBLIC_GAM_DETAIL_BANNER_AD_UNIT || "/21775744923/example/banner";
+
+    googletag.cmd.push(() => {
+      bannerSlot = googletag.defineSlot(
+        bannerAdUnit,
+        [[728, 90], [320, 50]],
+        "div-gpt-ad-detail-banner"
+      );
+
+      if (bannerSlot) {
+        var sizeMapping = googletag.sizeMapping()
+          .addSize([1024, 0], [728, 90]) // Desktop
+          .addSize([0, 0], [320, 50])    // Mobile/Tablet
+          .build();
+        
+        bannerSlot.defineSizeMapping(sizeMapping);
+        bannerSlot.addService(googletag.pubads());
+        googletag.display("div-gpt-ad-detail-banner");
+      }
+    });
+
+    return () => {
+      googletag.cmd.push(() => {
+        if (bannerSlot) {
+          googletag.destroySlots([bannerSlot]);
+        }
+      });
+    };
+  }, [loading, post]);
+
   // Click handler to open the rewarded overlay
   const handleWatchAd = () => {
     if (rewardedEventRef.current) {
@@ -262,6 +298,11 @@ export default function PostDetailPage({ params }) {
               unlock it to reuse it anytime in your favorite AI image generator.
             </p>
 
+            {/* Above-prompt responsive ad banner */}
+            <div className="pf-ad-detail-wrapper">
+              <div id="div-gpt-ad-detail-banner" />
+            </div>
+
             <div className="pf-prompt-card">
               {unlocked ? (
                 // Unlocked View
@@ -312,6 +353,14 @@ export default function PostDetailPage({ params }) {
                 </>
               )}
             </div>
+
+            {/* Content Field Rendered Below the Prompt Box */}
+            {post.content && (
+              <div 
+                className="pf-post-content" 
+                dangerouslySetInnerHTML={{ __html: post.content }} 
+              />
+            )}
           </article>
         </main>
 

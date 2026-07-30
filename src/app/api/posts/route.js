@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import dbConnect from "@/lib/db";
 import Post from "@/models/Post";
 
@@ -104,7 +105,7 @@ export async function POST(req) {
     await dbConnect();
     const data = await req.json();
     
-    const { title, category, image, prompt, blurb, author } = data;
+    const { title, category, image, prompt, blurb, author, content } = data;
 
     if (!title || !category || !image || !prompt) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -118,8 +119,10 @@ export async function POST(req) {
       blurb: blurb || "A ready-to-use AI prompt for this poster.",
       author: author || "Studio",
       date: todayLabel(),
+      content: content || "",
     });
 
+    revalidateTag("posts"); // Bust cached posts list
     return NextResponse.json(post, { status: 211 }); // using 201 Created or custom response
   } catch (error) {
     console.error("POST Error:", error);

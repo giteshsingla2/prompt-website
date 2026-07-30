@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import dbConnect from "@/lib/db";
 import Post from "@/models/Post";
 
@@ -36,6 +37,7 @@ export async function DELETE(req, { params }) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
+    revalidateTag("posts"); // Bust cached posts list
     return NextResponse.json({ message: "Post deleted successfully" });
   } catch (error) {
     console.error("DELETE Error:", error);

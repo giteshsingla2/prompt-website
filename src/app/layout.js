@@ -35,19 +35,14 @@ export default async function RootLayout({ children }) {
           {`
             window.googletag = window.googletag || { cmd: [] };
             googletag.cmd.push(function() {
-              // 1. Define Top Banner (Responsive: 728x90 on desktop, 320x50 on mobile)
+              // 1. Define Top Banner (300x250, 300x600, 320x50 — all viewports)
               var topBannerSlot = googletag.defineSlot(
                 '${topBannerAdUnit}',
-                [[728, 90], [320, 50]],
+                [[300, 250], [300, 600], [320, 50]],
                 'div-gpt-ad-top-banner'
               );
               
               if (topBannerSlot) {
-                var sizeMapping = googletag.sizeMapping()
-                  .addSize([1024, 0], [728, 90]) // Desktop
-                  .addSize([0, 0], [320, 50])    // Mobile/Tablet
-                  .build();
-                topBannerSlot.defineSizeMapping(sizeMapping);
                 topBannerSlot.addService(googletag.pubads());
               }
 

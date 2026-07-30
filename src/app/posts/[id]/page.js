@@ -185,17 +185,11 @@ export default function PostDetailPage({ params }) {
     googletag.cmd.push(() => {
       bannerSlot = googletag.defineSlot(
         bannerAdUnit,
-        [[728, 90], [320, 50]],
+        [[300, 600], [300, 250]],
         "div-gpt-ad-detail-banner"
       );
 
       if (bannerSlot) {
-        var sizeMapping = googletag.sizeMapping()
-          .addSize([1024, 0], [728, 90]) // Desktop
-          .addSize([0, 0], [320, 50])    // Mobile/Tablet
-          .build();
-        
-        bannerSlot.defineSizeMapping(sizeMapping);
         bannerSlot.addService(googletag.pubads());
         googletag.display("div-gpt-ad-detail-banner");
       }

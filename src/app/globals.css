@@ -819,38 +819,25 @@ html, body {
   align-items: center;
   padding: 12px 16px 0;
   margin: 0 auto;
-  min-height: 50px;
+  min-height: 50px;   /* expands naturally to fit 300x600 */
   width: 100%;
 }
 .pf-top-ad-wrapper > div {
   max-width: 100%;
   overflow: hidden;
 }
+/* In-feed ad: no box, no border, no label — pure ad slot for max CTR */
 .pf-ad-card-infeed {
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: var(--card);
-  border: 1px dashed var(--line) !important;
-  border-radius: 14px;
-  min-height: 290px;
-  padding: 12px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 8px 0;
+  margin: 0 auto;
   text-align: center;
-  position: relative;
   overflow: hidden;
-  box-shadow: none !important;
-  transform: none !important;
-}
-.pf-ad-card-infeed::before {
-  content: 'SPONSOR';
-  position: absolute;
-  top: 8px;
-  right: 12px;
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--muted);
-  letter-spacing: 1px;
 }
 .pf-ad-detail-wrapper {
   display: flex;

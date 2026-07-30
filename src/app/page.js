@@ -1,65 +1,165 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useState, useEffect } from "react";
+import { Loader2, Tag, Unlock, Lock, Clock, ImagePlus, Search } from "lucide-react";
+import Header from "@/components/Header";
+import Sidebar from "@/components/Sidebar";
+
+export default function HomeFeed() {
+  const [posts, setPosts] = useState([]);
+  const [unlockedIds, setUnlockedIds] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [query, setQuery] = useState("");
+
+  // Fetch posts from MongoDB API and load URL parameters
+  useEffect(() => {
+    const initPage = async () => {
+      // 1. Parse URL query parameters
+      if (typeof window !== "undefined") {
+        const urlParams = new URLSearchParams(window.location.search);
+        const catParam = urlParams.get("cat");
+        const qParam = urlParams.get("q");
+        if (catParam) {
+          setActiveCategory(catParam);
+        }
+        if (qParam) {
+          setQuery(qParam);
+        }
+
+        // Load unlocked posts from local storage
+        const unlockedRaw = localStorage.getItem("unlocked-ids-v2");
+        if (unlockedRaw) {
+          try {
+            setUnlockedIds(JSON.parse(unlockedRaw));
+          } catch (e) {
+            setUnlockedIds([]);
+          }
+        }
+      }
+
+      // 2. Fetch posts from DB
+      try {
+        const res = await fetch("/api/posts");
+        if (res.ok) {
+          const list = await res.json();
+          setPosts(list);
+        }
+      } catch (e) {
+        console.error("Failed to load posts from API:", e);
+      }
+
+      setLoading(false);
+    };
+
+    initPage();
+  }, []);
+
+  const categories = Array.from(new Set(posts.map((p) => p.category)));
+  
+  // Filter logic
+  const filtered = posts.filter((p) => {
+    const matchesCat = activeCategory === "All" || p.category === activeCategory;
+    const matchesQuery =
+      !query.trim() ||
+      p.title.toLowerCase().includes(query.trim().toLowerCase()) ||
+      p.category.toLowerCase().includes(query.trim().toLowerCase());
+    return matchesCat && matchesQuery;
+  });
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="pf-app">
+      <Header activeView="home" />
+
+      {loading ? (
+        <div className="pf-loading">
+          <Loader2 className="pf-spin" size={22} /> Loading feed from database…
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      ) : (
+        <div className="pf-shell">
+          <main className="pf-main">
+            <div>
+              <div className="pf-hero">
+                <span className="pf-eyebrow">AI poster prompts</span>
+                <h1>Prompts for posters that stop the scroll.</h1>
+                <p>Browse the feed, click on any poster you like, and unlock the exact prompt behind it.</p>
+              </div>
+
+              {/* Category tabs */}
+              <div className="pf-tabs">
+                <a
+                  className={"pf-tab" + (activeCategory === "All" ? " is-active" : "")}
+                  href="/"
+                >
+                  All
+                </a>
+                {categories.map((c) => (
+                  <a
+                    key={c}
+                    className={"pf-tab" + (activeCategory === c ? " is-active" : "")}
+                    href={`/?cat=${encodeURIComponent(c)}`}
+                  >
+                    {c}
+                  </a>
+                ))}
+              </div>
+
+              {query && (
+                <p className="pf-query-note">
+                  Showing results for “{query}” · {filtered.length} found
+                </p>
+              )}
+
+              {posts.length === 0 ? (
+                <div className="pf-empty">
+                  <ImagePlus size={26} />
+                  <p>No posts yet. Add your first poster to get started.</p>
+                </div>
+              ) : filtered.length === 0 ? (
+                <div className="pf-empty">
+                  <Search size={26} />
+                  <p>Nothing matches that search or category.</p>
+                </div>
+              ) : (
+                <div className="pf-grid">
+                  {filtered.map((p) => (
+                    <a
+                      className="pf-card"
+                      key={p.id}
+                      href={`/posts/${p.id}`}
+                      style={{ textDecoration: "none" }}
+                    >
+                      <div className="pf-card-img">
+                        <img src={p.image} alt={p.title} loading="lazy" />
+                      </div>
+                      <div className="pf-card-body">
+                        <div className="pf-card-tags">
+                          <span className="pf-tag"><Tag size={11} /> {p.category}</span>
+                          {unlockedIds.includes(p.id) ? (
+                            <span className="pf-tag pf-tag-open"><Unlock size={11} /> Unlocked</span>
+                          ) : (
+                            <span className="pf-tag pf-tag-locked"><Lock size={11} /> Locked</span>
+                          )}
+                        </div>
+                        <h3>{p.title}</h3>
+                        <div className="pf-card-meta">
+                          <Clock size={12} /> {p.date} · by {p.author}
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          </main>
+
+          <Sidebar
+            categories={categories}
+            activeCategory={activeCategory}
+            initialQuery={query}
+          />
         </div>
-      </main>
+      )}
     </div>
   );
 }

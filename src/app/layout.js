@@ -81,6 +81,19 @@ export default async function RootLayout({ children }) {
             }
           `}
         </Script>
+        {/* Google Analytics (gtag.js) */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-26WXS953GL"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-26WXS953GL');
+          `}
+        </Script>
         {/* Custom header code from DB (managed via admin panel Settings) */}
         <HeaderCode code={headerCode} />
       </head>

@@ -1,5 +1,6 @@
 import Script from "next/script";
 import HeaderCode from "@/components/HeaderCode";
+import TopBanner from "@/components/TopBanner";
 import { getCachedSettings } from "@/lib/dataCache";
 import "./globals.css";
 
@@ -34,56 +35,58 @@ export default async function RootLayout({ children }) {
         <Script id="gpt-global-ad-setup" strategy="afterInteractive">
           {`
             window.googletag = window.googletag || { cmd: [] };
-            googletag.cmd.push(function() {
-              // 1. Define Top Banner (300x250, 300x600, 320x50 — all viewports)
-              var topBannerSlot = googletag.defineSlot(
-                '${topBannerAdUnit}',
-                [[300, 250], [300, 600], [320, 50]],
-                'div-gpt-ad-top-banner'
-              );
-              
-              if (topBannerSlot) {
-                topBannerSlot.addService(googletag.pubads());
-              }
+            
+            // Skip ad slot initialization on admin / login paths
+            if (window.location.pathname.indexOf('z4q8wx-postr-92k') === -1) {
+              googletag.cmd.push(function() {
+                // 1. Define Top Banner (300x250, 300x600, 320x50 — all viewports)
+                var topBannerSlot = googletag.defineSlot(
+                  '${topBannerAdUnit}',
+                  [[300, 250], [300, 600], [320, 50]],
+                  'div-gpt-ad-top-banner'
+                );
+                
+                if (topBannerSlot) {
+                  topBannerSlot.addService(googletag.pubads());
+                }
 
-              // 2. Define Bottom Anchor Ad (out-of-page floating slot)
-              var anchorSlot = googletag.defineOutOfPageSlot(
-                '${anchorAdUnit}',
-                googletag.enums.OutOfPageFormat.BOTTOM_ANCHOR
-              );
-              if (anchorSlot) {
-                anchorSlot.addService(googletag.pubads());
-              }
+                // 2. Define Bottom Anchor Ad (out-of-page floating slot)
+                var anchorSlot = googletag.defineOutOfPageSlot(
+                  '${anchorAdUnit}',
+                  googletag.enums.OutOfPageFormat.BOTTOM_ANCHOR
+                );
+                if (anchorSlot) {
+                  anchorSlot.addService(googletag.pubads());
+                }
 
-              // 3. Define Web Interstitial Ad (displays between page loads)
-              var interstitialSlot = googletag.defineOutOfPageSlot(
-                '${interstitialAdUnit}',
-                googletag.enums.OutOfPageFormat.INTERSTITIAL
-              );
-              if (interstitialSlot) {
-                interstitialSlot.addService(googletag.pubads());
-              }
+                // 3. Define Web Interstitial Ad (displays between page loads)
+                var interstitialSlot = googletag.defineOutOfPageSlot(
+                  '${interstitialAdUnit}',
+                  googletag.enums.OutOfPageFormat.INTERSTITIAL
+                );
+                if (interstitialSlot) {
+                  interstitialSlot.addService(googletag.pubads());
+                }
 
-              googletag.enableServices();
+                googletag.enableServices();
 
-              // Trigger display for static layout slots
-              if (topBannerSlot) {
-                googletag.display('div-gpt-ad-top-banner');
-              }
-              if (anchorSlot) {
-                googletag.display(anchorSlot);
-              }
-            });
+                // Trigger display for static layout slots
+                if (topBannerSlot) {
+                  googletag.display('div-gpt-ad-top-banner');
+                }
+                if (anchorSlot) {
+                  googletag.display(anchorSlot);
+                }
+              });
+            }
           `}
         </Script>
         {/* Custom header code from DB (managed via admin panel Settings) */}
         <HeaderCode code={headerCode} />
       </head>
       <body suppressHydrationWarning={true}>
-        {/* Top Banner Ad Placed Before Everything Else */}
-        <div className="pf-top-ad-wrapper">
-          <div id="div-gpt-ad-top-banner" />
-        </div>
+        {/* Top Banner Ad Placed Before Everything Else (hidden on admin/login page) */}
+        <TopBanner />
         
         {children}
       </body>

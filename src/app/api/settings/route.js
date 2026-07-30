@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
+import { revalidateTag, revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import dbConnect from "@/lib/db";
 import Settings from "@/models/Settings";
@@ -42,6 +42,7 @@ export async function PUT(req) {
     );
 
     revalidateTag("settings"); // Bust layout's cached header code
+    revalidatePath("/", "layout"); // Revalidate all pages using the root layout
     return NextResponse.json({ success: true, setting });
   } catch (e) {
     console.error("Settings PUT error:", e);

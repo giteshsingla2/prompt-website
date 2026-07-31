@@ -77,6 +77,9 @@ export default async function RootLayout({ children }) {
                 if (anchorSlot) {
                   googletag.display(anchorSlot);
                 }
+                if (interstitialSlot) {
+                  googletag.display(interstitialSlot);
+                }
               });
             }
           `}

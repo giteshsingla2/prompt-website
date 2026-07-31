@@ -5,7 +5,6 @@ import { Loader2, Tag, Unlock, Lock, Clock, ImagePlus, Search } from "lucide-rea
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 
-// Component that dynamically registers a Google Ad Manager in-feed slot
 function InFeedAd({ index }) {
   useEffect(() => {
     window.googletag = window.googletag || { cmd: [] };
@@ -13,8 +12,8 @@ function InFeedAd({ index }) {
     const adUnit = process.env.NEXT_PUBLIC_GAM_INFEED_AD_UNIT || "/21775744923/example/banner";
     
     googletag.cmd.push(() => {
-      // Define a slot targeting the unique container ID for this index
-      slot = googletag.defineSlot(adUnit, [300, 250], `div-gpt-ad-infeed-${index}`);
+      // Define a slot supporting both 300x250 and 320x50 sizes for maximum mobile fill rate
+      slot = googletag.defineSlot(adUnit, [[300, 250], [320, 50]], `div-gpt-ad-infeed-${index}`);
       if (slot) {
         slot.addService(googletag.pubads());
         googletag.display(`div-gpt-ad-infeed-${index}`);
@@ -33,7 +32,7 @@ function InFeedAd({ index }) {
 
   return (
     <div className="pf-ad-card-infeed">
-      <div id={`div-gpt-ad-infeed-${index}`} style={{ width: "300px", height: "250px" }} />
+      <div id={`div-gpt-ad-infeed-${index}`} style={{ display: "inline-block" }} />
     </div>
   );
 }

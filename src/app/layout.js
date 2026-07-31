@@ -68,6 +68,19 @@ export default async function RootLayout({ children }) {
                   interstitialSlot.addService(googletag.pubads());
                 }
 
+                // Listen to slot render end to notify TopBanner component of status and loaded size
+                googletag.pubads().addEventListener('slotRenderEnded', function(event) {
+                  if (event.slot.getSlotElementId() === 'div-gpt-ad-top-banner') {
+                    var customEvent = new CustomEvent('topAdRendered', {
+                      detail: {
+                        isEmpty: event.isEmpty,
+                        size: event.size
+                      }
+                    });
+                    window.dispatchEvent(customEvent);
+                  }
+                });
+
                 googletag.enableServices();
 
                 // Trigger display for static layout slots

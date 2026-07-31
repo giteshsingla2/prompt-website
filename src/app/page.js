@@ -1,18 +1,52 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Loader2, Tag, Unlock, Lock, Clock, ImagePlus, Search } from "lucide-react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 
 function InFeedAd({ index }) {
+  const containerRef = useRef(null);
+  const [hasIntersected, setHasIntersected] = useState(false);
+
+  // Set up intersection observer to detect when user gets close to the ad slot
   useEffect(() => {
+    if (hasIntersected) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setHasIntersected(true);
+            observer.disconnect();
+          }
+        });
+      },
+      {
+        root: null, // Viewport
+        rootMargin: "250px", // Trigger slightly before it comes into viewport (for smooth loading)
+        threshold: 0.01,
+      }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [hasIntersected]);
+
+  // Request the ad unit only after intersection occurs
+  useEffect(() => {
+    if (!hasIntersected) return;
+
     window.googletag = window.googletag || { cmd: [] };
     let slot;
     const adUnit = process.env.NEXT_PUBLIC_GAM_INFEED_AD_UNIT || "/21775744923/example/banner";
-    
+
     googletag.cmd.push(() => {
-      // Define a slot supporting both 300x250 and 320x50 sizes for maximum mobile fill rate
       slot = googletag.defineSlot(adUnit, [[300, 250], [320, 50]], `div-gpt-ad-infeed-${index}`);
       if (slot) {
         slot.addService(googletag.pubads());
@@ -20,7 +54,6 @@ function InFeedAd({ index }) {
       }
     });
 
-    // Cleanup slot on unmount/re-render to prevent duplicate element registration
     return () => {
       googletag.cmd.push(() => {
         if (slot) {
@@ -28,11 +61,13 @@ function InFeedAd({ index }) {
         }
       });
     };
-  }, [index]);
+  }, [hasIntersected, index]);
 
   return (
-    <div className="pf-ad-card-infeed">
-      <div id={`div-gpt-ad-infeed-${index}`} style={{ display: "inline-block" }} />
+    <div className="pf-ad-card-infeed" ref={containerRef}>
+      {hasIntersected && (
+        <div id={`div-gpt-ad-infeed-${index}`} style={{ display: "inline-block" }} />
+      )}
     </div>
   );
 }

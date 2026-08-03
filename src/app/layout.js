@@ -114,9 +114,6 @@ export default async function RootLayout({ children }) {
         <HeaderCode code={headerCode} />
       </head>
       <body suppressHydrationWarning={true}>
-        {/* Top Banner Ad Placed Before Everything Else (hidden on admin/login page) */}
-        <TopBanner />
-        
         {children}
       </body>
     </html>

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, use } from "react";
 import { ArrowLeft, Tag, Unlock, Lock, Clock, Copy, Check, PlayCircle, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
+import TopBanner from "@/components/TopBanner";
 
 export default function PostDetailPage({ params }) {
   // Resolve params Promise
@@ -239,6 +240,7 @@ export default function PostDetailPage({ params }) {
     return (
       <div className="pf-app">
         <Header activeView="home" />
+        <TopBanner />
         <div className="pf-loading">
           <Loader2 className="pf-spin" size={22} /> Loading details...
         </div>
@@ -250,6 +252,7 @@ export default function PostDetailPage({ params }) {
     return (
       <div className="pf-app">
         <Header activeView="home" />
+        <TopBanner />
         <div className="pf-shell">
           <main className="pf-main">
             <div className="pf-empty">
@@ -268,6 +271,7 @@ export default function PostDetailPage({ params }) {
   return (
     <div className="pf-app">
       <Header activeView="home" />
+      <TopBanner />
 
       <div className="pf-shell">
         <main className="pf-main">

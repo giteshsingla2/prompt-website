@@ -7,7 +7,7 @@ export default function TopBanner() {
   const pathname = usePathname();
   const [adState, setAdState] = useState({
     status: "loading", // "loading" | "filled" | "unfilled"
-    height: 250,      // Start with a standard reserved height of 250px
+    height: 600,      // Start with a standard reserved height of 600px
   });
 
   // Check if current route is the admin/login page
@@ -15,13 +15,6 @@ export default function TopBanner() {
 
   useEffect(() => {
     if (isAdmin) return;
-
-    // Detect mobile viewport to adjust initial placeholder height
-    if (typeof window !== "undefined") {
-      if (window.innerWidth < 640) {
-        setAdState((prev) => ({ ...prev, height: 100 })); // 100px placeholder on mobile
-      }
-    }
 
     const handleAdRendered = (e) => {
       const { isEmpty, size } = e.detail;
@@ -31,7 +24,7 @@ export default function TopBanner() {
           height: 0,
         });
       } else {
-        const height = size && size[1] ? size[1] : 250;
+        const height = size && size[1] ? size[1] : 600;
         setAdState({
           status: "filled",
           height,

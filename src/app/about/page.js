@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
+import TopBanner from "@/components/TopBanner";
 import { getCachedPosts } from "@/lib/dataCache";
 import { Sparkles, ImagePlus, Copy, Zap, Star, Heart } from "lucide-react";
 
@@ -70,6 +71,7 @@ export default async function AboutPage() {
   return (
     <div className="pf-app">
       <Header activeView="about" />
+      <TopBanner />
 
       <div className="pf-shell">
         <main className="pf-main">

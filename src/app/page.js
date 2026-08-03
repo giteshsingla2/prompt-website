@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Loader2, Tag, Unlock, Lock, Clock, ImagePlus, Search } from "lucide-react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
+import TopBanner from "@/components/TopBanner";
 
 function InFeedAd({ index }) {
   const containerRef = useRef(null);
@@ -137,6 +138,7 @@ export default function HomeFeed() {
   return (
     <div className="pf-app">
       <Header activeView="home" />
+      <TopBanner />
 
       {loading ? (
         <div className="pf-loading">

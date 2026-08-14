@@ -99,7 +99,7 @@ export default async function RootLayout({ children }) {
         </Script>
         {/* Google Analytics (gtag.js) */}
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-26WXS953GL"
+          src="https://www.googletagmanager.com/gtag/js?id=G-H0JP5W2VX9"
           strategy="afterInteractive"
         />
         <Script id="google-analytics" strategy="afterInteractive">
@@ -107,7 +107,7 @@ export default async function RootLayout({ children }) {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-26WXS953GL');
+            gtag('config', 'G-H0JP5W2VX9');
           `}
         </Script>
         {/* Custom header code from DB (managed via admin panel Settings) */}
